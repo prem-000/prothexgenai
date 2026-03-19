@@ -95,212 +95,255 @@
     </style>
 </head>
 
-<body class="flex flex-col pb-24">
-    <!-- Header -->
-    <header
-        class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 h-16 flex items-center justify-between">
-        <h1 class="text-xl font-bold tracking-tight text-text-primary">Settings</h1>
-        <button id="btn-logout"
-            class="p-2 rounded-xl hover:bg-card-dark text-accent-red transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">logout</span>
-            <span class="text-xs font-bold uppercase tracking-widest hidden sm:inline">Logout</span>
-        </button>
-    </header>
-
-    <main class="flex-1 w-full max-w-2xl mx-auto p-4 space-y-4">
-
-        <!-- SECTION: ABOUT -->
-        <div
-            class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300">
-            <button onclick="toggleSection(this)"
-                class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
-                <div class="flex items-center gap-4">
-                    <div class="size-10 rounded-xl bg-accent-blue/10 flex items-center justify-center text-accent-blue">
-                        <span class="material-symbols-outlined font-bold">info</span>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-text-primary">About System</h3>
-                        <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Health &
-                            Performance</p>
-                    </div>
-                </div>
-                <span
-                    class="material-symbols-outlined arrow-icon transition-transform text-text-secondary">expand_more</span>
-            </button>
-            <div class="accordion-content px-5">
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="p-3 bg-background-dark rounded-xl border border-border-dark">
-                        <p class="text-[9px] text-text-secondary font-bold uppercase tracking-tighter">App Version</p>
-                        <p id="app-version" class="text-sm font-bold text-accent-blue">v2.5.0</p>
-                    </div>
-                    <div class="p-3 bg-background-dark rounded-xl border border-border-dark">
-                        <p class="text-[9px] text-text-secondary font-bold uppercase tracking-tighter">Backend</p>
-                        <p id="backend-version" class="text-sm font-bold text-accent-green">Stable</p>
-                    </div>
-                    <div class="p-3 bg-background-dark rounded-xl border border-border-dark">
-                        <p class="text-[9px] text-text-secondary font-bold uppercase tracking-tighter">DB Connection</p>
-                        <p id="db-status" class="text-sm font-bold text-accent-blue">Cloud Atlas</p>
-                    </div>
-                    <div class="p-3 bg-background-dark rounded-xl border border-border-dark">
-                        <p class="text-[9px] text-text-secondary font-bold uppercase tracking-tighter">API Status</p>
-                        <div class="flex items-center gap-2">
-                            <span class="size-2 rounded-full bg-accent-green animate-pulse"></span>
-                            <span id="api-status" class="text-sm font-bold">Healthy</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h4 class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">Live Performance
-                    Metrics</h4>
-                <div id="about-chart" class="w-full h-24 bg-background-dark/50 rounded-xl overflow-hidden"></div>
+<body class="flex flex-col pb-24 lg:pb-0 lg:flex-row">
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <aside class="hidden lg:flex flex-col sticky top-0 w-64 h-screen bg-background-dark border-r border-border-dark p-6 z-20 shrink-0">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined font-bold">clinical_notes</span>
             </div>
+            <span class="text-xl font-bold tracking-tight text-text-primary">ProthexaI</span>
         </div>
+        <nav class="flex flex-col gap-2 flex-1">
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:text-primary hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined font-bold">dashboard</span>
+                <span class="font-bold text-sm tracking-wider">Dashboard</span>
+            </a>
+            <a href="analytics.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:text-primary hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="font-bold text-sm tracking-wider">Analytics</span>
+            </a>
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:text-primary hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-bold text-sm tracking-wider">Profile</span>
+            </a>
+            <a href="settings.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/20 text-primary transition-colors">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">settings</span>
+                <span class="font-bold text-sm tracking-wider">Settings</span>
+            </a>
+        </nav>
+    </aside>
 
-        <!-- SECTION: FEEDBACK -->
-        <div
-            class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300">
-            <button onclick="toggleSection(this)"
-                class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
-                <div class="flex items-center gap-4">
-                    <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <span class="material-symbols-outlined font-bold">chat_bubble</span>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-text-primary">Feedback</h3>
-                        <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Community &
-                            Reports</p>
-                    </div>
-                </div>
-                <span
-                    class="material-symbols-outlined arrow-icon transition-transform text-text-secondary">expand_more</span>
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto w-full">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 h-16 lg:h-[73px] flex items-center justify-between w-full max-w-[1400px] mx-auto">
+            <h1 class="text-xl font-bold tracking-tight text-text-primary">Settings</h1>
+            <button id="btn-logout"
+                class="p-2 lg:px-4 lg:py-2 rounded-xl hover:bg-card-dark text-accent-red transition-all flex items-center gap-2 border border-transparent lg:border-accent-red/20 lg:hover:border-accent-red/50">
+                <span class="material-symbols-outlined text-[20px]">logout</span>
+                <span class="text-xs font-bold uppercase tracking-widest hidden sm:inline">Logout</span>
             </button>
-            <div class="accordion-content px-5">
-                <div class="flex flex-col sm:flex-row gap-6 mb-8">
-                    <!-- Donut Chart -->
-                    <div class="flex-1 flex flex-col items-center">
-                        <div id="feedback-donut" class="relative w-32 h-32"></div>
-                        <div class="mt-2 flex gap-4 text-[9px] uppercase tracking-widest font-bold">
-                            <span class="flex items-center gap-1"><span
-                                    class="size-2 rounded-full bg-accent-red"></span> Bug</span>
-                            <span class="flex items-center gap-1"><span
-                                    class="size-2 rounded-full bg-accent-amber"></span> Feature</span>
-                            <span class="flex items-center gap-1"><span
-                                    class="size-2 rounded-full bg-accent-blue"></span> General</span>
+        </header>
+
+        <main class="flex-1 w-full max-w-[1400px] mx-auto p-4 lg:p-8 space-y-4 lg:space-y-6">
+
+            <div class="lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0 space-y-4">
+                <!-- SECTION: ABOUT -->
+                <div
+                    class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300 flex flex-col">
+                    <button onclick="toggleSection(this)"
+                        class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors lg:pointer-events-none">
+                        <div class="flex items-center gap-4">
+                            <div class="size-10 rounded-xl bg-accent-blue/10 flex items-center justify-center text-accent-blue">
+                                <span class="material-symbols-outlined font-bold">info</span>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-text-primary lg:text-lg">About System</h3>
+                                <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Health &
+                                    Performance</p>
+                            </div>
+                        </div>
+                        <span
+                            class="material-symbols-outlined arrow-icon transition-transform text-text-secondary lg:hidden">expand_more</span>
+                    </button>
+                    <!-- On desktop always expanded -->
+                    <div class="accordion-content px-5 lg:max-h-none lg:pb-5">
+                        <div class="grid grid-cols-2 gap-3 lg:gap-4 mb-6">
+                            <div class="p-3 lg:p-4 bg-background-dark rounded-xl border border-border-dark">
+                                <p class="text-[9px] lg:text-[10px] text-text-secondary font-bold uppercase tracking-tighter">App Version</p>
+                                <p id="app-version" class="text-sm lg:text-base font-bold text-accent-blue">v2.5.0</p>
+                            </div>
+                            <div class="p-3 lg:p-4 bg-background-dark rounded-xl border border-border-dark">
+                                <p class="text-[9px] lg:text-[10px] text-text-secondary font-bold uppercase tracking-tighter">Backend</p>
+                                <p id="backend-version" class="text-sm lg:text-base font-bold text-accent-green">Stable</p>
+                            </div>
+                            <div class="p-3 lg:p-4 bg-background-dark rounded-xl border border-border-dark">
+                                <p class="text-[9px] lg:text-[10px] text-text-secondary font-bold uppercase tracking-tighter">DB Connection</p>
+                                <p id="db-status" class="text-sm lg:text-base font-bold text-accent-blue">Cloud Atlas</p>
+                            </div>
+                            <div class="p-3 lg:p-4 bg-background-dark rounded-xl border border-border-dark">
+                                <p class="text-[9px] lg:text-[10px] text-text-secondary font-bold uppercase tracking-tighter">API Status</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="size-2 rounded-full bg-accent-green animate-pulse"></span>
+                                    <span id="api-status" class="text-sm lg:text-base font-bold">Healthy</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">Live Performance
+                            Metrics</h4>
+                        <div id="about-chart" class="w-full h-24 lg:h-32 bg-background-dark/50 rounded-xl overflow-hidden"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: PRIVACY -->
+                <div
+                    class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300 flex flex-col">
+                    <button onclick="toggleSection(this)"
+                        class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors lg:pointer-events-none">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="size-10 rounded-xl bg-accent-green/10 flex items-center justify-center text-accent-green">
+                                <span class="material-symbols-outlined font-bold">shield</span>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-text-primary lg:text-lg">Privacy & Security</h3>
+                                <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Encryption & Data
+                                    Core</p>
+                            </div>
+                        </div>
+                        <span
+                            class="material-symbols-outlined arrow-icon transition-transform text-text-secondary lg:hidden">expand_more</span>
+                    </button>
+                    <!-- On desktop always expanded -->
+                    <div class="accordion-content px-5 lg:max-h-none lg:pb-5 flex-1 flex flex-col justify-center">
+                        <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center gap-8 lg:gap-6 xl:gap-8">
+                            <!-- Three.js Container -->
+                            <div id="canvas-container"
+                                class="w-48 h-48 lg:w-40 lg:h-40 xl:w-48 xl:h-48 rounded-full bg-background-dark/50 overflow-hidden relative group cursor-pointer shrink-0">
+                                <!-- Tooltip -->
+                                <div id="security-tooltip"
+                                    class="absolute inset-0 bg-background-dark/90 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 text-center">
+                                    <p class="text-[10px] font-black text-accent-green uppercase tracking-tighter mb-2">Protocol
+                                        Active</p>
+                                    <ul class="text-[9px] text-text-secondary font-bold space-y-1">
+                                        <li>JWT AUTHENTICATION</li>
+                                        <li>ARGON2 HASHING</li>
+                                        <li>ATLAS SSL ENCRYPTION</li>
+                                        <li>ROLE-BASED ACCESS</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Details -->
+                            <div class="flex-1 space-y-4 w-full">
+                                <div class="p-4 bg-background-dark rounded-xl border border-border-dark">
+                                    <h4 class="text-sm font-bold text-text-primary mb-1">HIPAA Compliant Core</h4>
+                                    <p class="text-[11px] text-text-secondary leading-relaxed">Your biomechanical data is
+                                        encrypted end-to-end and stored in medical-grade secure clusters.</p>
+                                </div>
+                                <div class="flex justify-between items-center px-2">
+                                    <span class="text-[10px] lg:text-xs font-bold text-text-secondary uppercase tracking-widest">Security
+                                        Score</span>
+                                    <span class="text-sm lg:text-base font-black text-accent-green">99.8%</span>
+                                </div>
+                                <div class="w-full h-1 lg:h-2 bg-background-dark rounded-full overflow-hidden">
+                                    <div class="h-full bg-accent-green w-[99.8%]"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Form -->
-                    <form id="feedback-form" class="flex-[2] space-y-3">
-                        <select id="issue-type"
-                            class="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all">
-                            <option value="Bug">Report a Bug</option>
-                            <option value="Feature">Request Feature</option>
-                            <option value="General">General Feedback</option>
-                        </select>
-                        <textarea id="description" rows="3" placeholder="Describe your experience..."
-                            class="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all resize-none"></textarea>
-                        <button type="submit"
-                            class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                            <span id="btn-text">Send Feedback</span>
-                            <span id="btn-status-icon"
-                                class="material-symbols-outlined text-sm hidden">check_circle</span>
-                        </button>
-                    </form>
                 </div>
+
+                <!-- SECTION: NOTIFICATIONS -->
+                <div
+                    class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300 lg:col-span-2">
+                    <button onclick="toggleSection(this)"
+                        class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors lg:pointer-events-none">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="size-10 rounded-xl bg-accent-amber/10 flex items-center justify-center text-accent-amber">
+                                <span class="material-symbols-outlined font-bold">notifications</span>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-text-primary lg:text-lg">Notifications</h3>
+                                <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Recent Alerts &
+                                    Logs</p>
+                            </div>
+                        </div>
+                        <span
+                            class="material-symbols-outlined arrow-icon transition-transform text-text-secondary lg:hidden">expand_more</span>
+                    </button>
+                    <!-- On desktop always expanded -->
+                    <div class="accordion-content px-5 lg:max-h-none lg:pb-5">
+                        <h4 class="text-[10px] lg:text-xs font-bold text-text-secondary uppercase tracking-widest mb-3 lg:mb-4">Timeline (30 Days)
+                        </h4>
+                        <div id="notification-timeline" class="w-full h-32 lg:h-40 bg-background-dark/50 rounded-xl mb-6"></div>
+
+                        <div class="space-y-3 max-h-80 overflow-y-auto pr-1" id="notification-list">
+                            <!-- Notifications will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: FEEDBACK -->
+                <div
+                    class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300 lg:col-span-2">
+                    <button onclick="toggleSection(this)"
+                        class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors lg:pointer-events-none">
+                        <div class="flex items-center gap-4">
+                            <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined font-bold">chat_bubble</span>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-text-primary lg:text-lg">Feedback</h3>
+                                <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Community &
+                                    Reports</p>
+                            </div>
+                        </div>
+                        <span
+                            class="material-symbols-outlined arrow-icon transition-transform text-text-secondary lg:hidden">expand_more</span>
+                    </button>
+                    <!-- On desktop always expanded -->
+                    <div class="accordion-content px-5 lg:max-h-none lg:pb-8">
+                        <div class="flex flex-col sm:flex-row gap-6 lg:gap-12 mb-8">
+                            <!-- Donut Chart -->
+                            <div class="flex-1 flex flex-col items-center justify-center">
+                                <div id="feedback-donut" class="relative w-32 h-32 lg:w-48 lg:h-48"></div>
+                                <div class="mt-4 flex gap-4 text-[9px] lg:text-xs uppercase tracking-widest font-bold">
+                                    <span class="flex items-center gap-1"><span
+                                            class="size-2 rounded-full bg-accent-red"></span> Bug</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="size-2 rounded-full bg-accent-amber"></span> Feature</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="size-2 rounded-full bg-accent-blue"></span> General</span>
+                                </div>
+                            </div>
+                            <!-- Form -->
+                            <form id="feedback-form" class="flex-[2] space-y-4 lg:space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] lg:text-xs font-bold text-text-secondary uppercase tracking-widest pl-1">Issue Type</label>
+                                    <select id="issue-type"
+                                        class="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 lg:py-4 text-sm lg:text-base focus:border-primary outline-none transition-all">
+                                        <option value="Bug">Report a Bug</option>
+                                        <option value="Feature">Request Feature</option>
+                                        <option value="General">General Feedback</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] lg:text-xs font-bold text-text-secondary uppercase tracking-widest pl-1">Description</label>
+                                    <textarea id="description" rows="4" placeholder="Describe your experience..."
+                                        class="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 lg:py-4 text-sm lg:text-base focus:border-primary outline-none transition-all resize-none"></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 lg:py-4 lg:text-lg rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                    <span id="btn-text">Send Feedback</span>
+                                    <span id="btn-status-icon"
+                                        class="material-symbols-outlined text-sm hidden">check_circle</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </div>
 
-        <!-- SECTION: NOTIFICATIONS -->
-        <div
-            class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300">
-            <button onclick="toggleSection(this)"
-                class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="size-10 rounded-xl bg-accent-amber/10 flex items-center justify-center text-accent-amber">
-                        <span class="material-symbols-outlined font-bold">notifications</span>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-text-primary">Notifications</h3>
-                        <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Recent Alerts &
-                            Logs</p>
-                    </div>
-                </div>
-                <span
-                    class="material-symbols-outlined arrow-icon transition-transform text-text-secondary">expand_more</span>
-            </button>
-            <div class="accordion-content px-5">
-                <h4 class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">Timeline (30 Days)
-                </h4>
-                <div id="notification-timeline" class="w-full h-32 bg-background-dark/50 rounded-xl mb-6"></div>
+        </main>
+    </div>
 
-                <div class="space-y-3 max-h-80 overflow-y-auto pr-1" id="notification-list">
-                    <!-- Notifications will be injected here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: PRIVACY -->
-        <div
-            class="accordion-item glass-card rounded-2xl border border-border-dark overflow-hidden transition-all duration-300">
-            <button onclick="toggleSection(this)"
-                class="w-full flex items-center justify-between p-5 hover:bg-white/5 transition-colors">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="size-10 rounded-xl bg-accent-green/10 flex items-center justify-center text-accent-green">
-                        <span class="material-symbols-outlined font-bold">shield</span>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-text-primary">Privacy & Security</h3>
-                        <p class="text-[10px] text-text-secondary uppercase tracking-widest font-bold">Encryption & Data
-                            Core</p>
-                    </div>
-                </div>
-                <span
-                    class="material-symbols-outlined arrow-icon transition-transform text-text-secondary">expand_more</span>
-            </button>
-            <div class="accordion-content px-5">
-                <div class="flex flex-col sm:flex-row items-center gap-8">
-                    <!-- Three.js Container -->
-                    <div id="canvas-container"
-                        class="w-48 h-48 rounded-full bg-background-dark/50 overflow-hidden relative group cursor-pointer">
-                        <!-- Tooltip -->
-                        <div id="security-tooltip"
-                            class="absolute inset-0 bg-background-dark/90 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 text-center">
-                            <p class="text-[10px] font-black text-accent-green uppercase tracking-tighter mb-2">Protocol
-                                Active</p>
-                            <ul class="text-[9px] text-text-secondary font-bold space-y-1">
-                                <li>JWT AUTHENTICATION</li>
-                                <li>ARGON2 HASHING</li>
-                                <li>ATLAS SSL ENCRYPTION</li>
-                                <li>ROLE-BASED ACCESS</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- Details -->
-                    <div class="flex-1 space-y-4">
-                        <div class="p-4 bg-background-dark rounded-xl border border-border-dark">
-                            <h4 class="text-sm font-bold text-text-primary mb-1">HIPAA Compliant Core</h4>
-                            <p class="text-[11px] text-text-secondary leading-relaxed">Your biomechanical data is
-                                encrypted end-to-end and stored in medical-grade secure clusters.</p>
-                        </div>
-                        <div class="flex justify-between items-center px-2">
-                            <span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Security
-                                Score</span>
-                            <span class="text-sm font-black text-accent-green">99.8%</span>
-                        </div>
-                        <div class="w-full h-1 bg-background-dark rounded-full overflow-hidden">
-                            <div class="h-full bg-accent-green w-[99.8%]"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Navigation -->
+    <!-- Mobile Navigation -->
     <nav
-        class="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-border-dark px-6 pb-6 pt-3 flex justify-between items-center nav-glow z-20">
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-background-dark border-t border-border-dark px-6 pb-6 pt-3 flex justify-between items-center nav-glow z-20">
         <a class="flex flex-col items-center gap-1 group text-text-secondary transition-colors" href="dashboard.html">
             <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
             <span class="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>

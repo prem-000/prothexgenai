@@ -43,36 +43,68 @@ window.onclick = (e) => {
     if (e.target === manualModal) manualModal.style.display = 'none';
 };
 
+function validateInput(data) {
+    if (!data.step_length || !data.cadence || !data.speed || !data.symmetry || 
+        !data.temperature || !data.moisture || !data.pressure || !data.wear_hours) {
+        throw new Error("All clinical fields are required.");
+    }
+
+    if (data.symmetry < 0 || data.symmetry > 1) {
+        throw new Error("Clinical Error: Symmetry must be between 0 and 1.");
+    }
+
+    if (data.pressure < 0) {
+        throw new Error("Clinical Error: Pressure cannot be negative.");
+    }
+
+    if (data.wear_hours < 0 || data.wear_hours > 24) {
+        throw new Error("Clinical Error: Wear hours must be between 0 and 24.");
+    }
+
+    if (data.step_length <= 0 || data.cadence <= 0 || data.speed <= 0) {
+        throw new Error("Clinical Error: Movement metrics must be positive.");
+    }
+}
+
 manualForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const statusEl = document.getElementById('manual-status');
-    statusEl.textContent = 'Submitting...';
-    statusEl.style.color = 'var(--text-muted)';
+    const submitBtn = manualForm.querySelector('button[type="submit"]');
 
     const payload = {
-        step_length_cm: parseFloat(document.getElementById('step_length').value),
-        cadence_spm: parseFloat(document.getElementById('cadence').value),
-        walking_speed_mps: parseFloat(document.getElementById('walking_speed').value),
-        gait_symmetry_index: parseFloat(document.getElementById('gait_symmetry').value),
-        skin_temperature_c: parseFloat(document.getElementById('skin_temp').value),
-        skin_moisture: parseFloat(document.getElementById('skin_moisture').value),
-        pressure_distribution_index: parseFloat(document.getElementById('pressure_dist').value),
-        daily_wear_hours: parseFloat(document.getElementById('wear_hours').value)
+        step_length: parseFloat(document.getElementById('step_length').value),
+        cadence: parseFloat(document.getElementById('cadence').value),
+        speed: parseFloat(document.getElementById('walking_speed').value),
+        symmetry: parseFloat(document.getElementById('gait_symmetry').value),
+        temperature: parseFloat(document.getElementById('skin_temp').value),
+        moisture: parseFloat(document.getElementById('skin_moisture').value),
+        pressure: parseFloat(document.getElementById('pressure_dist').value),
+        wear_hours: parseFloat(document.getElementById('wear_hours').value)
     };
 
     try {
-        const result = await apiRequest('/patient/daily-input', 'POST', payload);
-        statusEl.textContent = `✓ Success! Health Score: ${result.health_score.toFixed(1)}`;
+        // Validation Layer
+        validateInput(payload);
+
+        statusEl.textContent = 'Analyzing Biometrics...';
+        statusEl.style.color = 'var(--text-muted)';
+        submitBtn.disabled = true;
+
+        const result = await apiRequest('/analysis/analyze', 'POST', payload);
+        
+        statusEl.textContent = `✓ ML Analysis Success! Risk: ${result.risk_level}`;
         statusEl.style.color = 'var(--green)';
 
         setTimeout(() => {
             manualModal.style.display = 'none';
             manualForm.reset();
+            submitBtn.disabled = false;
             loadDashboard(); // Refresh
         }, 1500);
     } catch (error) {
-        statusEl.textContent = '✗ Failed: ' + error.message;
+        statusEl.textContent = '✗ Analysis Blocked: ' + error.message;
         statusEl.style.color = 'var(--red)';
+        submitBtn.disabled = false;
     }
 });
 
@@ -93,10 +125,9 @@ async function handleUpload(file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    // We need a custom fetch here for FormData since apiRequest uses JSON
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:8000/patient/upload-gait', {
+        const res = await fetch(`${API_BASE_URL}/patient/upload-gait`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -104,17 +135,20 @@ async function handleUpload(file) {
             body: formData
         });
 
-        if (!res.ok) throw new Error('Upload failed');
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || 'Upload failed');
+        }
 
-        status.textContent = 'Upload successful!';
+        status.textContent = 'Analysis complete!';
         status.style.color = 'var(--green)';
         setTimeout(() => {
             modal.style.display = 'none';
-            loadDashboard(); // Refresh
+            loadDashboard(); 
         }, 1500);
 
     } catch (err) {
-        status.textContent = 'Upload failed: ' + err.message;
+        status.textContent = 'Validation failed: ' + err.message;
         status.style.color = 'var(--red)';
     }
 }
@@ -122,49 +156,48 @@ async function handleUpload(file) {
 async function updateHealthScore(patientId, existingScore = null) {
     try {
         let score = existingScore;
+        let riskLevel = null;
 
         if (score === null && patientId) {
             const data = await apiRequest(`/patient/daily_metrics/${patientId}/latest`);
             score = data.prosthetic_health_score;
+            riskLevel = data.risk_level;
         }
 
         // Default to 0 if nothing found
         if (score === null || score === undefined) score = 0;
-
+        
+        // Fallback risk level calculation if not provided by backend
+        const riskText = riskLevel || (score >= 85 ? 'Low' : score >= 60 ? 'Moderate' : 'High');
+        
         const scoreVal = document.getElementById('health-score-val');
         const gaugeArc = document.getElementById('gauge-arc');
         const statusBadge = document.getElementById('health-status-badge');
 
         if (!scoreVal || !gaugeArc || !statusBadge) return;
 
-        scoreVal.textContent = score.toFixed(0);
+        scoreVal.textContent = Math.round(score);
+
+        let riskColor;
+        
+        switch (riskText) {
+            case 'Low': riskColor = '#22c55e'; break;
+            case 'Moderate': riskColor = '#f59e0b'; break;
+            case 'High': riskColor = '#ef4444'; break;
+            default: riskColor = '#0EA5E9';
+        }
 
         // SVG dashoffset: 125.66 is full semi-circle length for radius 40
         const offset = 125.66 - (score / 100 * 125.66);
         gaugeArc.style.strokeDashoffset = offset;
+        gaugeArc.style.stroke = riskColor;
+        scoreVal.style.color = riskColor;
 
-        // Risk Logic
-        let color, statusText, bgColor;
-        if (score >= 85) {
-            color = '#22c55e'; // Green
-            statusText = 'Status: Stable';
-            bgColor = 'rgba(34, 197, 94, 0.1)';
-        } else if (score >= 60) {
-            color = '#f59e0b'; // Amber
-            statusText = 'Status: Moderate Risk';
-            bgColor = 'rgba(245, 158, 11, 0.1)';
-        } else {
-            color = '#ef4444'; // Red
-            statusText = 'Status: High Risk';
-            bgColor = 'rgba(239, 68, 68, 0.1)';
+        if (statusBadge) {
+            statusBadge.textContent = `Status: ${riskText} Risk`;
+            statusBadge.style.color = riskColor;
+            statusBadge.style.backgroundColor = `${riskColor}1A`; // 10% opacity
         }
-
-        // Apply styles
-        gaugeArc.style.stroke = color;
-        scoreVal.style.color = color;
-        statusBadge.textContent = statusText;
-        statusBadge.style.color = color;
-        statusBadge.style.backgroundColor = bgColor;
 
     } catch (e) {
         console.error("Failed to update health score gauge", e);
@@ -413,13 +446,8 @@ async function downloadReport() {
     }
 
     try {
-        let baseUrl = 'http://localhost:8000';
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            baseUrl = 'https://prothexai.onrender.com'; // Production Backend
-        }
-
         const response = await fetch(
-            `${baseUrl}/report/patient/download-report`,
+            `${API_BASE_URL}/report/patient/download-report`,
             {
                 method: "GET",
                 headers: {

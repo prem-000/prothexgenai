@@ -1,0 +1,46 @@
+{
+  "model_name": "XGBoost_Tuned",
+  "features": [
+    "step_length",
+    "cadence",
+    "speed",
+    "symmetry",
+    "temperature",
+    "moisture",
+    "pressure",
+    "wear_hours",
+    "gait_efficiency",
+    "skin_stress_index",
+    "mech_load",
+    "asymmetry",
+    "gait_quality",
+    "overall_load"
+  ],
+  "base_features": [
+    "step_length",
+    "cadence",
+    "speed",
+    "symmetry",
+    "temperature",
+    "moisture",
+    "pressure",
+    "wear_hours"
+  ],
+  "risk_order": {
+    "Low": 0,
+    "Moderate": 1,
+    "High": 2,
+    "Critical": 3
+  },
+  "label_names": [
+    "Low",
+    "Moderate",
+    "High",
+    "Critical"
+  ],
+  "test_accuracy": 0.96,
+  "test_f1": 0.96,
+  "test_roc_auc": 0.9972,
+  "version": "2.0",
+  "trained_on": "prosthetic_gait_dataset_v1"
+}

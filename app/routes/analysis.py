@@ -27,77 +27,89 @@ async def analyze_record(
     user_id = current_user["_id"]
 
     try:
-        # 1. Fetch Patient Profile with Projection (Only required fields)
-        profile = await db["patient_profiles"].find_one(
-            {"$or": [{"user_id": user_id}, {"user_id": str(user_id)}]},
-            {"bmi": 1, "blood_pressure_systolic": 1, "blood_pressure_diastolic": 1, "blood_sugar_mg_dl": 1}
-        )
-        if not profile:
-            raise HTTPException(status_code=404, detail="Patient profile not found")
-
-        # 2. Fetch Daily Record
-        record_id = request.record_id
-        if not ObjectId.is_valid(record_id):
-            raise HTTPException(status_code=400, detail="Invalid record_id format")
-
-        record = await db["daily_metrics"].find_one(
-            {"_id": ObjectId(record_id)}
-        )
-        if not record:
-            raise HTTPException(status_code=404, detail="Biomechanical record not found")
-
-        # 3. Perform Analysis (Deterministic & Lightweight)
-        gait_score = analysis_service.calculate_gait_score(record)
-        pressure_risk = analysis_service.calculate_pressure_risk(record)
-        skin_risk = analysis_service.calculate_skin_risk(record)
-        risk_level = analysis_service.get_risk_level(gait_score, pressure_risk, skin_risk)
+        # Instead of fetching daily_metrics, we now use the incoming raw features directly
+        # as dictated by the ML Integration PRD.
+        features = request.model_dump(exclude={"record_id"})
         
-        flags = []
-        if gait_score < 75: flags.append("Abnormal Gait Symmetry")
-        if pressure_risk == "High": flags.append("High Pressure Risk")
-        if skin_risk == "High": flags.append("High Skin Risk")
+        # 1. Perform ML Analysis
+        predictions = analysis_service.run_ml_analysis(features)
         
-        recommendations = analysis_service.generate_summary(
-            gait_score, pressure_risk, skin_risk, record, profile
-        )
-
-        # 4. Store Summarized Result
+        # 2. Store Summarized Result
         execution_time_ms = (time.perf_counter() - start_time) * 1000
+        
+        # Support fallback to record_id if the client still sends it for linkage
+        record_obj_id = ObjectId(request.record_id) if request.record_id and ObjectId.is_valid(request.record_id) else None
         
         analysis_doc = {
             "user_id": user_id,
-            "record_id": ObjectId(record_id),
-            "overall_score": gait_score,
-            "risk_level": risk_level,
-            "key_flags": flags,
-            "recommendation_summary": recommendations,
+            "record_id": record_obj_id,
+            "gait_score": predictions["gait_score"],
+            "pressure_risk": predictions["pressure_risk"],
+            "skin_risk": predictions["skin_risk"],
+            "risk_level": predictions["risk_level"],
             "execution_time_ms": execution_time_ms,
             "created_at": datetime.now(timezone.utc)
         }
         
         await db["analysis_results"].insert_one(analysis_doc)
 
-        # 5. Log Analysis Metadata
+        # 3. Log Analysis Metadata
         logger.info(
-            f"Analysis Complete: user={user_id}, "
-            f"record={record_id}, "
+            f"ML Analysis Complete: user={user_id}, "
             f"time={execution_time_ms:.2f}ms"
         )
 
-        # 6. Return Minimal Response
+        # 4. Return PRD compliant response
         return AnalysisResponse(
-            overall_score=gait_score,
-            risk_level=risk_level,
-            key_flags=flags,
-            recommendation_summary=recommendations,
+            risk_level=predictions["risk_level"],
+            gait_score=predictions["gait_score"],
+            pressure_risk=predictions["pressure_risk"],
+            skin_risk=predictions["skin_risk"],
             execution_time_ms=execution_time_ms
         )
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Analysis failed for record {request.record_id}: {str(e)}")
+        logger.error(f"Analysis failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Analysis engine failed to process the request")
+
+@router.get("/health")
+async def ml_health():
+    """
+    Health check for ML registry and feature schema.
+    """
+    from app.ml.model_registry import ModelRegistry
+    scaler = ModelRegistry.get_model("scaler.pkl")
+    classifier = ModelRegistry.get_model("risk_classifier.pkl")
+    
+    models_loaded = all([scaler, classifier])
+    feature_count = len(scaler.feature_names_in_) if scaler and hasattr(scaler, "feature_names_in_") else 0
+    
+    return {
+        "status": "healthy" if models_loaded else "degraded",
+        "models_loaded": models_loaded,
+        "feature_count": feature_count,
+        "version": "2.0-production-ready"
+    }
+
+@router.post("/stress-test")
+async def stress_test(metrics: dict = Body(...)):
+    """
+    In-memory stress test for the ML pipeline with extreme inputs.
+    Does not persist to database.
+    """
+    try:
+        predictions = analysis_service.run_ml_analysis(metrics)
+        return {
+            "status": "success",
+            "predictions": predictions
+        }
+    except Exception as e:
+        return {
+            "status": "failed",
+            "error": str(e)
+        }
 
 @router.post("/run/{record_id}", deprecated=True)
 async def run_analysis_legacy(record_id: str, current_user: dict = Depends(get_current_user)):

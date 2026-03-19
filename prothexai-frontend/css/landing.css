@@ -1,13 +1,21 @@
 /* landing.css */
 
 .hero-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
-    padding: 0 4rem;
+    padding: 6rem 2rem 2rem 2rem;
     align-items: center;
     position: relative;
     overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    .hero-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 0 4rem;
+    }
 }
 
 .hero-content {
@@ -20,6 +28,7 @@
     font-weight: 800;
     line-height: 1.1;
     background: linear-gradient(to right, #fff, #94A3B8);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 1.5rem;

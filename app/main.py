@@ -22,10 +22,9 @@ async def lifespan(app: FastAPI):
     from app.database import connect_to_mongo, close_mongo_connection
     await connect_to_mongo()
     
-    # 2. ML Engine Warmup (Optional/Lazy)
-    from app.services.ai_engine import ai_engine
-    # Deferring actual model loading to first use to save memory/time, 
-    # but we could call ai_engine._ensure_initialized() here if preferred.
+    # 2. ML Engine Initialization
+    from app.ml.model_registry import ModelRegistry
+    ModelRegistry.load_models()
     
     # 3. Initialize Scheduler
     from apscheduler.schedulers.asyncio import AsyncIOScheduler

@@ -58,145 +58,185 @@
 </head>
 
 <body
-    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col pb-24">
-    <!-- Header -->
-    <header
-        class="sticky top-0 z-50 bg-background-dark border-b border-border-dark px-4 h-14 flex items-center justify-between">
-        <h1 class="text-base font-semibold tracking-tight">Clinical Analytics</h1>
-        <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-500 font-medium">Last 30 Days</span>
-            <button id="btn-download-report"
-                class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors border border-primary/20">
-                <span class="material-symbols-outlined text-[16px]">download</span>
-                <span class="text-xs font-bold">Report</span>
-            </button>
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col pb-24 lg:pb-0 lg:flex-row">
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <aside class="hidden lg:flex flex-col sticky top-0 w-64 h-screen bg-white dark:bg-card-dark border-r border-slate-200 dark:border-slate-800 p-6 z-20 shrink-0">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined font-bold">clinical_notes</span>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ProthexaI</span>
         </div>
-    </header>
+        <nav class="flex flex-col gap-2 flex-1">
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined font-bold">dashboard</span>
+                <span class="font-bold text-sm tracking-wider">Dashboard</span>
+            </a>
+            <a href="analytics.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/20 text-primary transition-colors">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">analytics</span>
+                <span class="font-bold text-sm tracking-wider">Analytics</span>
+            </a>
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-bold text-sm tracking-wider">Profile</span>
+            </a>
+            <a href="settings.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-bold text-sm tracking-wider">Settings</span>
+            </a>
+        </nav>
+    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-md mx-auto w-full px-4 py-6 space-y-6">
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto w-full">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 bg-background-dark border-b border-border-dark px-4 lg:px-8 py-4 h-auto lg:h-[73px] flex items-center justify-between w-full max-w-[1400px] mx-auto">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary lg:hidden">
+                    <span class="material-symbols-outlined font-bold">clinical_notes</span>
+                </div>
+                <h1 class="text-base lg:text-xl font-bold tracking-tight">Clinical Analytics</h1>
+            </div>
+            <div class="flex items-center gap-2 lg:gap-4">
+                <span class="hidden sm:inline text-xs lg:text-sm text-slate-500 font-medium">Last 30 Days</span>
+                <button id="btn-download-report"
+                    class="flex items-center gap-1.5 px-3 py-1.5 lg:px-4 lg:py-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors border border-primary/20">
+                    <span class="material-symbols-outlined text-[16px] lg:text-[20px]">download</span>
+                    <span class="text-xs lg:text-sm font-bold">Report</span>
+                </button>
+            </div>
+        </header>
 
-        <!-- Segmented Tabs -->
-        <div class="p-1 bg-card-dark rounded-xl flex border border-border-dark">
-            <button id="tab-gait"
-                class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-primary text-white shadow-sm transition-all tab-btn"
-                onclick="switchTab('gait')">
-                GAIT
-            </button>
-            <button id="tab-recovery"
-                class="flex-1 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-300 transition-all tab-btn"
-                onclick="switchTab('recovery')">
-                RECOVERY
-            </button>
-            <button id="tab-pressure"
-                class="flex-1 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-300 transition-all tab-btn"
-                onclick="switchTab('pressure')">
-                PRESSURE
-            </button>
-        </div>
+        <!-- Main Content -->
+        <main class="flex-1 max-w-[1400px] mx-auto w-full px-4 lg:px-8 py-6 space-y-6 lg:space-y-8">
 
-        <!-- GAIT TAB CONTENT -->
-        <div id="content-gait" class="space-y-6 tab-content">
-            <!-- Summary Row -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-card-dark border border-border-dark rounded-xl p-3">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Avg Symmetry</p>
-                    <p id="avg-sym" class="text-xl font-bold mt-1">--%</p>
-                </div>
-                <div class="bg-card-dark border border-border-dark rounded-xl p-3">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Avg Speed</p>
-                    <p id="avg-speed" class="text-xl font-bold mt-1">-- <span
-                            class="text-xs font-normal text-slate-500">m/s</span></p>
-                </div>
-                <div class="bg-card-dark border border-border-dark rounded-xl p-3">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Stride Len</p>
-                    <p id="avg-stride" class="text-xl font-bold mt-1">-- <span
-                            class="text-xs font-normal text-slate-500">cm</span></p>
-                </div>
-                <div class="bg-card-dark border border-border-dark rounded-xl p-3">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Step Freq</p>
-                    <p id="avg-cadence" class="text-xl font-bold mt-1">-- <span
-                            class="text-xs font-normal text-slate-500">spm</span></p>
+            <!-- Segmented Tabs -->
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+                <div class="p-1 bg-card-dark rounded-xl flex border border-border-dark lg:w-[400px]">
+                    <button id="tab-gait"
+                        class="flex-1 py-1.5 lg:py-2 text-xs lg:text-sm font-bold rounded-lg bg-primary text-white shadow-sm transition-all tab-btn"
+                        onclick="switchTab('gait')">
+                        GAIT
+                    </button>
+                    <button id="tab-recovery"
+                        class="flex-1 py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-slate-500 hover:text-slate-300 transition-all tab-btn"
+                        onclick="switchTab('recovery')">
+                        RECOVERY
+                    </button>
+                    <button id="tab-pressure"
+                        class="flex-1 py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-slate-500 hover:text-slate-300 transition-all tab-btn"
+                        onclick="switchTab('pressure')">
+                        PRESSURE
+                    </button>
                 </div>
             </div>
 
-            <!-- Chart 1: Dual Axis Line Chart (Gait Performance) -->
-            <div class="bg-card-dark border border-border-dark rounded-xl p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gait Performance</h3>
-                    <div class="flex gap-3 text-[10px] font-bold">
-                        <span class="flex items-center gap-1 text-accent-blue"><span
-                                class="w-2 h-2 rounded-full bg-accent-blue"></span> Symmetry</span>
-                        <span class="flex items-center gap-1 text-primary"><span
-                                class="w-2 h-2 rounded-full bg-primary"></span> Speed</span>
+            <!-- GAIT TAB CONTENT -->
+            <div id="content-gait" class="space-y-6 lg:space-y-8 tab-content">
+                <!-- Summary Row -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 flex flex-col justify-center">
+                        <p class="text-[10px] lg:text-xs text-slate-500 uppercase font-bold tracking-wider">Avg Symmetry</p>
+                        <p id="avg-sym" class="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">--%</p>
+                    </div>
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 flex flex-col justify-center">
+                        <p class="text-[10px] lg:text-xs text-slate-500 uppercase font-bold tracking-wider">Avg Speed</p>
+                        <p id="avg-speed" class="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">-- <span
+                                class="text-xs lg:text-sm font-normal text-slate-500">m/s</span></p>
+                    </div>
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 flex flex-col justify-center">
+                        <p class="text-[10px] lg:text-xs text-slate-500 uppercase font-bold tracking-wider">Stride Len</p>
+                        <p id="avg-stride" class="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">-- <span
+                                class="text-xs lg:text-sm font-normal text-slate-500">cm</span></p>
+                    </div>
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 flex flex-col justify-center">
+                        <p class="text-[10px] lg:text-xs text-slate-500 uppercase font-bold tracking-wider">Step Freq</p>
+                        <p id="avg-cadence" class="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">-- <span
+                                class="text-xs lg:text-sm font-normal text-slate-500">spm</span></p>
                     </div>
                 </div>
-                <div class="relative h-48 w-full">
-                    <canvas id="chart-gait-dual"></canvas>
-                </div>
-            </div>
 
-            <!-- Chart 4: Wear Hours Bar Chart -->
-            <div class="bg-card-dark border border-border-dark rounded-xl p-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Daily Wear Hours</h3>
-                <div class="relative h-40 w-full">
-                    <canvas id="chart-wear-hours"></canvas>
-                </div>
-            </div>
-        </div>
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                    <!-- Chart 1: Dual Axis Line Chart (Gait Performance) -->
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6">
+                        <div class="flex justify-between items-center mb-4 lg:mb-6">
+                            <h3 class="text-xs lg:text-sm font-bold text-slate-400 uppercase tracking-wider">Gait Performance</h3>
+                            <div class="flex gap-3 text-[10px] lg:text-xs font-bold">
+                                <span class="flex items-center gap-1 text-accent-blue"><span
+                                        class="w-2 lg:w-3 h-2 lg:h-3 rounded-full bg-accent-blue"></span> Symmetry</span>
+                                <span class="flex items-center gap-1 text-primary"><span
+                                        class="w-2 lg:w-3 h-2 lg:h-3 rounded-full bg-primary"></span> Speed</span>
+                            </div>
+                        </div>
+                        <div class="relative h-48 lg:h-72 w-full">
+                            <canvas id="chart-gait-dual"></canvas>
+                        </div>
+                    </div>
 
-        <!-- RECOVERY TAB CONTENT -->
-        <div id="content-recovery" class="space-y-6 tab-content hidden">
-            <!-- Chart 3: Health Score Trend -->
-            <div class="bg-card-dark border border-border-dark rounded-xl p-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Health Score Trend</h3>
-                <div class="relative h-48 w-full">
-                    <canvas id="chart-health-trend"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- PRESSURE TAB CONTENT -->
-        <div id="content-pressure" class="space-y-6 tab-content hidden">
-            <!-- Chart 2: Pressure & Skin Chart -->
-            <div class="bg-card-dark border border-border-dark rounded-xl p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pressure & Skin Health</h3>
-                    <div class="flex gap-3 text-[10px] font-bold">
-                        <span class="flex items-center gap-1 text-accent-red"><span
-                                class="w-2 h-2 rounded-full bg-accent-red"></span> Pressure</span>
-                        <span class="flex items-center gap-1 text-accent-green"><span
-                                class="w-2 h-2 rounded-full bg-accent-green"></span> Temp</span>
+                    <!-- Chart 4: Wear Hours Bar Chart -->
+                    <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6">
+                        <h3 class="text-xs lg:text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 lg:mb-6">Daily Wear Hours</h3>
+                        <div class="relative h-40 lg:h-72 w-full">
+                            <canvas id="chart-wear-hours"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div class="relative h-48 w-full">
-                    <canvas id="chart-pressure-skin"></canvas>
+            </div>
+
+            <!-- RECOVERY TAB CONTENT -->
+            <div id="content-recovery" class="space-y-6 lg:space-y-8 tab-content hidden">
+                <!-- Chart 3: Health Score Trend -->
+                <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 max-w-4xl mx-auto w-full">
+                    <h3 class="text-xs lg:text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 lg:mb-6">Health Score Trend</h3>
+                    <div class="relative h-48 lg:h-80 w-full">
+                        <canvas id="chart-health-trend"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- AI Clinical Insight Card (Global Bottom) -->
-        <div class="bg-card-dark border border-border-dark rounded-xl p-4 flex gap-4 items-start">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <span class="material-symbols-outlined text-primary text-[18px]">auto_awesome</span>
-            </div>
-            <div>
-                <div class="flex justify-between items-baseline mb-1">
-                    <h4 class="text-sm font-bold text-slate-200">Clinical Correlation</h4>
-                    <span class="text-[10px] font-bold text-accent-green">r = 0.82</span>
+            <!-- PRESSURE TAB CONTENT -->
+            <div id="content-pressure" class="space-y-6 lg:space-y-8 tab-content hidden">
+                <!-- Chart 2: Pressure & Skin Chart -->
+                <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 max-w-4xl mx-auto w-full">
+                    <div class="flex justify-between items-center mb-4 lg:mb-6">
+                        <h3 class="text-xs lg:text-sm font-bold text-slate-400 uppercase tracking-wider">Pressure & Skin Health</h3>
+                        <div class="flex gap-3 text-[10px] lg:text-xs font-bold">
+                            <span class="flex items-center gap-1 text-accent-red"><span
+                                    class="w-2 lg:w-3 h-2 lg:h-3 rounded-full bg-accent-red"></span> Pressure</span>
+                            <span class="flex items-center gap-1 text-accent-green"><span
+                                    class="w-2 lg:w-3 h-2 lg:h-3 rounded-full bg-accent-green"></span> Temp</span>
+                        </div>
+                    </div>
+                    <div class="relative h-48 lg:h-80 w-full">
+                        <canvas id="chart-pressure-skin"></canvas>
+                    </div>
                 </div>
-                <p id="ai-insight-text" class="text-xs text-slate-400 leading-relaxed">
-                    Strong positive correlation computed between symmetry and gait speed. Current deviation is within
-                    acceptable clinical limits.
-                </p>
             </div>
-        </div>
 
-    </main>
+            <!-- AI Clinical Insight Card (Global Bottom) -->
+            <div class="bg-card-dark border border-border-dark rounded-xl p-4 lg:p-6 flex gap-4 lg:gap-6 items-start">
+                <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5 lg:mt-0">
+                    <span class="material-symbols-outlined text-primary text-[18px] lg:text-[24px]">auto_awesome</span>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline mb-1 lg:mb-2">
+                        <h4 class="text-sm lg:text-base font-bold text-slate-200">Clinical Correlation</h4>
+                        <span class="text-[10px] lg:text-xs font-bold text-accent-green">r = 0.82</span>
+                    </div>
+                    <p id="ai-insight-text" class="text-xs lg:text-sm text-slate-400 leading-relaxed">
+                        Strong positive correlation computed between symmetry and gait speed. Current deviation is within
+                        acceptable clinical limits.
+                    </p>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <!-- Persistent Bottom Nav -->
     <nav
-        class="fixed bottom-0 left-0 right-0 bg-card-dark border-t border-border-dark h-16 flex items-center justify-around z-50">
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-card-dark border-t border-border-dark h-16 flex items-center justify-around z-50">
         <a href="dashboard.html" class="flex flex-col items-center text-slate-500 hover:text-primary transition">
             <span class="material-symbols-outlined text-[22px]">dashboard</span>
             <span class="text-[11px] mt-1">Dashboard</span>

@@ -15,7 +15,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 1rem;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .history-table {

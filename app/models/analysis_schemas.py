@@ -3,19 +3,26 @@ from typing import List, Optional
 from datetime import datetime
 
 class AnalysisRequest(BaseModel):
-    record_id: str
-    # These fields can be passed if we want to avoid extra DB calls, 
-    # but the task implies fetching from DB. 
-    # However, strict validation on input data is requested.
-    # If the user sends raw data for analysis:
-    metrics: Optional[dict] = None
+    # Backward compatibility: record_id can still be accepted but is optional
+    record_id: Optional[str] = None
+    
+    # ML Features per PRD
+    step_length: float = Field(default=0.0)
+    cadence: float = Field(default=0.0)
+    speed: float = Field(default=0.0)
+    symmetry: float = Field(default=0.0)
+    temperature: float = Field(default=0.0)
+    moisture: float = Field(default=0.0)
+    pressure: float = Field(default=0.0)
+    wear_hours: float = Field(default=0.0)
 
 class AnalysisResponse(BaseModel):
-    overall_score: float = Field(..., ge=0, le=100)
-    risk_level: str # Low, Moderate, High
-    key_flags: List[str]
-    recommendation_summary: List[str]
-    execution_time_ms: float
+    risk_level: str
+    gait_score: float
+    pressure_risk: float
+    skin_risk: float
+    # Optional metadata if needed by frontend/debug
+    execution_time_ms: Optional[float] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class AnalysisMetadata(BaseModel):
