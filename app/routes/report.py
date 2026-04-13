@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi.responses import StreamingResponse
 from app.core.dependencies import get_current_user, check_role
 from app.database import get_db
@@ -74,17 +77,23 @@ async def download_report(current_user: dict = Depends(check_role("patient"))):
         })
     
     # 5. Debug output
-    print(f"--- GENERATING STREAMING PDF REPORT FOR PATENT {patient_id} ---")
+    logger.info(f"Generating PDF report for patient {patient_id}")
 
-    # 6. Generate PDF InMemory
-    # We use the existing robust PDF service which returns a BytesIO buffer
-    pdf_buffer = generate_medical_pdf(summary_data)
-    pdf_buffer.seek(0)
-    
-    return StreamingResponse(
-        pdf_buffer,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=Health_Report_{today}.pdf"
-        },
-    )
+    try:
+        # 6. Generate PDF InMemory
+        pdf_buffer = generate_medical_pdf(summary_data)
+        pdf_content = pdf_buffer.getvalue()
+        pdf_buffer.close()
+        
+        from fastapi import Response
+        return Response(
+            content=pdf_content,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=Health_Report_{today}.pdf",
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            },
+        )
+    except Exception as e:
+        logger.error(f"PDF Generation Failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)}")

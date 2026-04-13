@@ -7,7 +7,7 @@ argon2-cffi
 python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
-google-generativeai
+google-genai
 python-multipart
 apscheduler
 reportlab

@@ -40,8 +40,33 @@ async def analyze_record(
         # Support fallback to record_id if the client still sends it for linkage
         record_obj_id = ObjectId(request.record_id) if request.record_id and ObjectId.is_valid(request.record_id) else None
         
+        # Determine patient_id (linked to user_id)
+        profile = await db["patient_profiles"].find_one({"user_id": user_id})
+        patient_id = profile["_id"] if profile else user_id
+
+        # A. Create Daily Metric Record (for Dashboard & Calendar UI)
+        daily_record = {
+            "patient_id": patient_id,
+            "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "step_length_cm": request.step_length,
+            "cadence_spm": request.cadence,
+            "walking_speed_mps": request.speed,
+            "gait_symmetry_index": request.symmetry,
+            "skin_temperature_c": request.temperature,
+            "skin_moisture": request.moisture,
+            "pressure_distribution_index": request.pressure,
+            "daily_wear_hours": request.wear_hours,
+            "gait_abnormality": "Abnormal" if predictions["risk_level"] == "High" else "Normal",
+            "skin_risk": "High" if predictions["skin_risk"] > 50 else "Low", 
+            "prosthetic_health_score": predictions["gait_score"],
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db["daily_metrics"].insert_one(daily_record)
+
+        # B. Store Detailed Analysis Result
         analysis_doc = {
             "user_id": user_id,
+            "patient_id": patient_id,
             "record_id": record_obj_id,
             "gait_score": predictions["gait_score"],
             "pressure_risk": predictions["pressure_risk"],
@@ -50,12 +75,11 @@ async def analyze_record(
             "execution_time_ms": execution_time_ms,
             "created_at": datetime.now(timezone.utc)
         }
-        
         await db["analysis_results"].insert_one(analysis_doc)
 
         # 3. Log Analysis Metadata
         logger.info(
-            f"ML Analysis Complete: user={user_id}, "
+            f"ML Analysis Saved: user={user_id}, "
             f"time={execution_time_ms:.2f}ms"
         )
 

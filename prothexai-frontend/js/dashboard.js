@@ -1,4 +1,4 @@
-import { apiRequest } from './api.js';
+import { apiRequest, API_BASE_URL } from './api.js';
 import { drawGauge } from './gauge.js';
 import { DualAxisCorrelationChart } from './correlationChart.js';
 import { RecoveryChart } from './recoveryChart.js';

@@ -38,21 +38,17 @@ Keep responses concise, medically accurate, and professional.
 Do not provide general knowledge or unrelated advice."""
 
 # ─── Gemini Chat Engine ────────────────────────────────────
-_chat_model = None
+_genai_client = None
 
-def _get_chat_model():
-    global _chat_model
+def _get_genai_client():
+    global _genai_client
     try:
-        if _chat_model is None:
-            import google.generativeai as genai
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            _chat_model = genai.GenerativeModel(
-                "gemini-2.0-flash",
-                system_instruction=CLINICAL_SYSTEM_PROMPT
-            )
-        return _chat_model
+        if _genai_client is None:
+            from google import genai
+            _genai_client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        return _genai_client
     except Exception as e:
-        logger.error(f"Failed to initialize Gemini Model: {e}")
+        logger.error(f"Failed to initialize GenAI Client: {e}")
         return None
 
 def _get_fallback_response(user_message: str) -> str:
@@ -73,24 +69,34 @@ def _get_fallback_response(user_message: str) -> str:
 async def _generate_chat_response(user_message: str, history: list) -> str:
     """Generate a response from Gemini given the user message and conversation history."""
     try:
-        model = _get_chat_model()
+        client = _get_genai_client()
         
-        if not model:
-            logger.warning("Gemini model not initialized, using fallback.")
+        if not client:
+            logger.warning("GenAI client not initialized, using fallback.")
             return _get_fallback_response(user_message)
         
         # Build conversation context from history (last 10 messages for performance)
         recent_history = history[-10:] if len(history) > 10 else history
         
-        # Format history for Gemini
-        gemini_history = []
+        # Format history for GenAI SDK
+        contents = []
         for msg in recent_history:
             role = "user" if msg["sender"] == "user" else "model"
-            gemini_history.append({"role": role, "parts": [msg["message"]]})
+            contents.append({"role": role, "parts": [{"text": msg["message"]}]})
         
-        # Start chat with history
-        chat = model.start_chat(history=gemini_history)
-        response = await chat.send_message_async(user_message)
+        # Add current message
+        contents.append({"role": "user", "parts": [{"text": user_message}]})
+        
+        from google.genai import types
+        response = client.models.generate_content(
+            model="gemini-1.5-flash", # Switched to 1.5-flash to resolve 2.0-flash quota issues
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=CLINICAL_SYSTEM_PROMPT,
+                max_output_tokens=500,
+                temperature=0.7
+            )
+        )
         
         if not response or not response.text:
             return "I'm currently unable to process your request. Please try again."
