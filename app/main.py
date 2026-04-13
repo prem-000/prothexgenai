@@ -16,7 +16,7 @@ logger = logging.getLogger("uvicorn")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     startup_begin = time.time()
-    logger.info("🚀 Starting application initialization...")
+    logger.info("[START] Starting application initialization...")
 
     # 1. Database Connection (Lazy)
     from app.database import connect_to_mongo, close_mongo_connection
@@ -36,12 +36,12 @@ async def lifespan(app: FastAPI):
     app.state.scheduler = scheduler
     
     startup_duration = time.time() - startup_begin
-    logger.info(f"✅ Application startup complete in {startup_duration:.2f}s")
+    logger.info(f"[OK] Application startup complete in {startup_duration:.2f}s")
     
     yield
     
     # Shutdown logic
-    logger.info("🛑 Shutting down application...")
+    logger.info("[STOP] Shutting down application...")
     await close_mongo_connection()
     if hasattr(app.state, "scheduler"):
         app.state.scheduler.shutdown()
@@ -58,8 +58,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5500", # Localhost (Live Server)
         "http://127.0.0.1:5500",
-        "https://your-frontend.vercel.app", # Vercel Frontend (Update this!)
-        "*" # Warning: Remove this in production!
+        "https://prothexgenai.onrender.com", 
+        "*" 
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -104,4 +104,10 @@ async def system_health():
 
 # Calculate and log import time
 import_duration = time.time() - start_import_time
-logger.info(f"⏱️ Module import time: {import_duration:.2f}s")
+logger.info(f"[TIMER] Module import time: {import_duration:.2f}s")
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)

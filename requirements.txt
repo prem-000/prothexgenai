@@ -1,13 +1,33 @@
+# Web Framework
 fastapi
 uvicorn[standard]
+
+# Database
 motor
-pydantic[email]
-pydantic-settings
-argon2-cffi
+dnspython
+
+# Auth & Security
 python-jose[cryptography]
 passlib[bcrypt]
-python-dotenv
-google-genai
+argon2-cffi
 python-multipart
+
+# Config & Validation
+pydantic[email]
+pydantic-settings
+python-dotenv
+
+# ML Stack
+numpy
+pandas
+scikit-learn
+joblib
+
+# AI
+google-genai
+
+# Scheduling
 apscheduler
+
+# PDF Generation
 reportlab
