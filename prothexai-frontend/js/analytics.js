@@ -1,4 +1,4 @@
-import { apiRequest } from './api.js';
+import { apiRequest, API_BASE_URL } from './api.js';
 
 // ---- CHART CONFIGURATION ----
 const commonOptions = {

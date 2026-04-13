@@ -34,12 +34,10 @@ class Settings(BaseSettings):
 def get_settings():
     try:
         settings = Settings()
-        # Simple debug print to confirm critical env vars are loaded
-        if settings.MONGO_URI:
-            print(f"✅ Settings loaded successfully from {ENV_FILE_PATH}")
+        logger.info(f"[OK] Settings loaded successfully from {ENV_FILE_PATH}")
         return settings
     except Exception as e:
-        print(f"❌ Error loading settings from {ENV_FILE_PATH}: {e}")
+        logger.error(f"[ERROR] Failed to load settings from {ENV_FILE_PATH}: {e}")
         raise e
 
 settings = get_settings()
